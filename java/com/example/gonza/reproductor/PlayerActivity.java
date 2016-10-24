@@ -184,7 +184,9 @@ public class PlayerActivity extends AppCompatActivity
 					MediaStore.Audio.Media.TRACK
 			);
 
-			cover.setImageURI(Uri.parse(data.getStringExtra("albumCover")));
+			String tmp = data.getStringExtra("albumCover");
+			if (tmp != null)
+				cover.setImageURI(Uri.parse(tmp));
 			playlist.clear();
 			int i = 0;
 			while (cursor.moveToNext()) {
