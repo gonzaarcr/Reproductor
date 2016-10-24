@@ -187,7 +187,7 @@ public class PlayerActivity extends AppCompatActivity
 			cover.setImageURI(Uri.parse(data.getStringExtra("albumCover")));
 			playlist.clear();
 			int i = 0;
-			if (cursor.moveToFirst()) {
+			while (cursor.moveToNext()) {
 				playlist.add(new Song(Uri.parse(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)))));
 				playlist.get(i).setTitle(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
 				playlist.get(i).setDuration(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)));
