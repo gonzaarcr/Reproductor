@@ -17,7 +17,7 @@
         android:layout_marginRight="10dp"/>
 
 	<TextView
-		android:id="@+id/title"
+		android:id="@+id/albumTitle"
 		android:textSize="16dp"
 		android:textStyle="bold"
         android:layout_toRightOf="@+id/album_art"
@@ -27,8 +27,8 @@
 		android:layout_height="wrap_content" />
 
 	<TextView
-		android:id="@+id/album"
-		android:layout_below="@id/title"
+		android:id="@+id/artist"
+		android:layout_below="@id/albumTitle"
 		android:layout_toRightOf="@+id/album_art"
         android:layout_toEndOf="@+id/album_art"
 		android:layout_width="match_parent"

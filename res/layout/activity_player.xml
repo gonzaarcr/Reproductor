@@ -5,34 +5,43 @@
                 android:layout_height="match_parent">
 
     <ImageView
+        android:id="@+id/coverView"
         android:layout_width="200dp"
         android:layout_height="175dp"
         app:srcCompat="@drawable/default_cover"
-        android:id="@+id/coverView"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"/>
 
-    <ListView
-        android:id="@+id/listView"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/playlistView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@+id/coverView"
-        android:layout_above="@+id/frameLayout"
+        android:layout_above="@+id/controlPanel"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"/>
 
     <RelativeLayout
-        android:id="@+id/frameLayout"
+        android:id="@+id/controlPanel"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_alignParentBottom="true">
 
-        <Button
+        <ImageButton
+            android:id="@+id/colectionButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:srcCompat="@android:drawable/ic_menu_sort_by_size"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"/>
+
+        <ImageButton
             android:text="Previous"
             android:id="@+id/previousButton"
+            app:srcCompat="@android:drawable/ic_media_previous"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -41,17 +50,19 @@
             android:layout_toLeftOf="@+id/playPauseButton"
             android:layout_toStartOf="@+id/playPauseButton"/>
 
-        <Button
+        <ImageButton
             android:text="Play"
             android:id="@+id/playPauseButton"
+            app:srcCompat="@android:drawable/ic_media_play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"/>
 
-        <Button
+        <ImageButton
             android:text="Next"
             android:id="@+id/nextButton"
+            app:srcCompat="@android:drawable/ic_media_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
@@ -60,4 +71,5 @@
             android:layout_toRightOf="@+id/playPauseButton"
             android:layout_toEndOf="@+id/playPauseButton"/>
     </RelativeLayout>
+
 </RelativeLayout>

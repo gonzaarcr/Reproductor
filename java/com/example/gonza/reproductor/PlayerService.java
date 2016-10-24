@@ -86,6 +86,30 @@ MediaPlayer.OnCompletionListener {
 		}
 	}
 
+	public void playPause() {
+		if (musicPlayer.isPlaying()) {
+			musicPlayer.pause();
+			isPause = true;
+		} else if (isPause) {
+			musicPlayer.start();
+			isPause = false;
+		}
+	}
+
+	public void nextSong() {
+		if (songPos == songs.size() - 1)
+			musicPlayer.stop();
+		else
+			playSong(songPos + 1);
+	}
+
+	public void previousSong() {
+		if (songPos == 0)
+			musicPlayer.stop();
+		else
+			playSong(songPos - 1);
+	}
+
 	@Override
 	public void onPrepared(MediaPlayer mp) {
 		mp.start();
