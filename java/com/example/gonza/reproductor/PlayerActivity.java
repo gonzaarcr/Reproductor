@@ -14,24 +14,27 @@ import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by gonza on 23/10/16.
  */
 
-public class PlayerActivity extends Activity
+public class PlayerActivity extends AppCompatActivity
 		implements PlaylistAdapter.OnItemClickListener,
 		ActivityCompat.OnRequestPermissionsResultCallback {
 
 	private ImageView cover;
-	private List<Song> playlist;
+	private List<Song> playlist = new ArrayList<>();
 	private RecyclerView playlistView;
 	private PlaylistAdapter mAdapter;
 
@@ -63,8 +66,8 @@ public class PlayerActivity extends Activity
 	};
 
 	@Override
-	public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
-		super.onCreate(savedInstanceState, persistentState);
+	public void onCreate(Bundle savedInstanceState/*, PersistableBundle persistentState*/) {
+		super.onCreate(savedInstanceState/*, persistentState*/);
 		setContentView(R.layout.activity_player);
 
 		cover = (ImageView) findViewById(R.id.coverView);
@@ -171,6 +174,7 @@ public class PlayerActivity extends Activity
 					MediaStore.Audio.Media.TITLE,
 					MediaStore.Audio.Media.ARTIST,
 					MediaStore.Audio.Media.ALBUM,
+					MediaStore.Audio.Media.DURATION,
 					MediaStore.Audio.Media.YEAR };
 			Cursor cursor = getContentResolver().query(
 					MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -182,8 +186,12 @@ public class PlayerActivity extends Activity
 
 			cover.setImageURI(Uri.parse(data.getStringExtra("albumCover")));
 			playlist.clear();
+			int i = 0;
 			if (cursor.moveToFirst()) {
 				playlist.add(new Song(Uri.parse(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)))));
+				playlist.get(i).setTitle(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
+				playlist.get(i).setDuration(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)));
+				i++;
 			}
 			cursor.close();
 		}

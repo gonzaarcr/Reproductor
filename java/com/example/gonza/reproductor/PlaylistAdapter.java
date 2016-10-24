@@ -58,7 +58,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.MyView
 	public PlaylistAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent,
 	                                                        int viewType) {
 		// create a new view
-		View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.colection_element, parent, false);
+		View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.playlist_element, parent, false);
 		// set the view's size, margins, paddings and layout parameters
 		// ...
 		//TextView tv = new TextView(parent.getContext(), null);
@@ -71,7 +71,11 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.MyView
 		// - get element from your dataset at this position
 		// - replace the contents of the view with that element
 		holder.title.setText(mDataset.get(position).getTitle());
-		holder.duration.setText("00:00");
+		long duration = mDataset.get(position).getDuration() / 1000;
+		String minutos = String.valueOf(duration / 60);
+		String segundos = String.valueOf(duration % 60);
+		String tmp = segundos.length() == 1? "0" + segundos : segundos;
+		holder.duration.setText( minutos + ":" + tmp);
 	}
 
 	// Return the size of your dataset (invoked by the layout manager)

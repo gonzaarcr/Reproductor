@@ -9,6 +9,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -73,13 +74,13 @@ public class MainActivity extends AppCompatActivity
 	}
 
 	public void initAlbums() {
-		String[] projection = { 
-				MediaStore.Audio.AlbumColumns.ARTIST,
-				MediaStore.Audio.AlbumColumns.FIRST_YEAR,
+		String[] projection = {
 				MediaStore.Audio.AlbumColumns.ALBUM,
+				MediaStore.Audio.AlbumColumns.ARTIST,
+				MediaStore.Audio.AlbumColumns.LAST_YEAR,
 				MediaStore.Audio.AlbumColumns.ALBUM_ART };
 		Cursor cursor = getContentResolver().query(
-				MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+				MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
 				projection,
 				null, null, null
 		);
@@ -89,7 +90,7 @@ public class MainActivity extends AppCompatActivity
 			myDataset.add(new Song());
 			myDataset.get(i).setArtist(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AlbumColumns.ARTIST)));
 			myDataset.get(i).setAlbum(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AlbumColumns.ALBUM)));
-			myDataset.get(i).setYear(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.AlbumColumns.FIRST_YEAR)));
+			myDataset.get(i).setYear(cursor.getInt(cursor.getColumnIndex(MediaStore.Audio.AlbumColumns.LAST_YEAR)));
 			myDataset.get(i).setAlbumArt(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AlbumColumns.ALBUM_ART)));
 			i++;
 		}

@@ -14,6 +14,7 @@ public class Song {
 	private String album;
 	private String albumArt;
 	private int year;
+	private long duration;
 
 	public Song() {
 	}
@@ -68,6 +69,14 @@ public class Song {
 
 	public void setYear(int year) {
 		this.year = year;
+	}
+
+	public long getDuration() {
+		return duration;
+	}
+
+	public void setDuration(long duration) {
+		this.duration = duration;
 	}
 
 	@Override
