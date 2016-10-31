@@ -1,7 +1,6 @@
 package com.example.gonza.reproductor;
 
 import android.app.Activity;
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
 import android.media.AudioManager;
@@ -10,7 +9,6 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -28,8 +26,6 @@ MediaPlayer.OnCompletionListener {
 	boolean isPause = false;
 	List<Activity> observers = new ArrayList<>();
 
-	final int NOTIFICATION_ID = 1;
-
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -38,15 +34,8 @@ MediaPlayer.OnCompletionListener {
 	}
 
 	private void initMusicPlayer() {
-		// The wake lock will let playback continue when the device becomes idle 
-		// and we set the stream type to music
 		musicPlayer.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
 		musicPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-		// Set the class as listener for 
-		// (1) when the PlayerActivity instance is prepared,
-		// (2) when a song has completed playback, and when 
-		// (3) an error is thrown
 		musicPlayer.setOnPreparedListener(this);
 		musicPlayer.setOnCompletionListener(this);
 		musicPlayer.setOnErrorListener(this);
@@ -165,14 +154,9 @@ MediaPlayer.OnCompletionListener {
 	}
 
 	private void emitSongChange(Song song) {
-		// updateNotification(song);
 		for (Activity a: observers) {
 			((PlayerActivity) a).onSongChange(song);
 		}
-	}
-
-	public Song getPlaying() {
-		return playing;
 	}
 
 	public class MusicBinder extends Binder {

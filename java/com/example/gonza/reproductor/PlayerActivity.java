@@ -2,6 +2,8 @@ package com.example.gonza.reproductor;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +16,7 @@ import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,10 +28,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
-
-/**
- * Created by gonza on 23/10/16.
- */
 
 public class PlayerActivity extends AppCompatActivity
 		implements PlaylistAdapter.OnItemClickListener,
@@ -53,6 +52,7 @@ public class PlayerActivity extends AppCompatActivity
 	private boolean musicBound = false;
 
 	private final int PICK_ALBUM_REQUEST = 1;
+	private final int NOTIFICATION_ID = 1;
 
 	private ServiceConnection musicConnection = new ServiceConnection() {
 		@Override
@@ -181,7 +181,6 @@ public class PlayerActivity extends AppCompatActivity
 	}
 
 	public void onSongChange(Song newSong) {
-		// TODO
 		playingTitle.setText(newSong.getTitle());
 		playingAlbum.setText(newSong.getAlbum());
 		playingArtist.setText(newSong.getArtist());
@@ -190,6 +189,21 @@ public class PlayerActivity extends AppCompatActivity
 			cover.setImageURI(Uri.parse(tmp));
 		else
 			cover.setImageResource(R.drawable.default_cover);
+		updateNotification(newSong);
+	}
+
+	private void updateNotification(Song newSong) {
+		NotificationCompat.Builder mBuilder =
+				new NotificationCompat.Builder(this)
+						.setSmallIcon(R.mipmap.ic_launcher)
+						.setContentTitle(newSong.getTitle())
+						.setContentText("From "+ newSong.getAlbum() +" by "+ newSong.getArtist());
+		NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		Intent notifyIntent = new Intent(this, PlayerActivity.class);
+		notifyIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, 0);
+		mBuilder.setContentIntent(pendingIntent);
+		mNotifyMgr.notify(NOTIFICATION_ID, mBuilder.build());
 	}
 
 	@Override
@@ -211,7 +225,6 @@ public class PlayerActivity extends AppCompatActivity
 			);
 
 			playlist.clear();
-			int i = 0;
 			while (cursor.moveToNext()) {
 				Song newSong = new Song(Uri.parse(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))));
 				newSong.setTitle(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
@@ -220,7 +233,6 @@ public class PlayerActivity extends AppCompatActivity
 				newSong.setAlbum(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)));
 				newSong.setAlbumArt(data.getStringExtra("albumCover"));
 				playlist.add(newSong);
-				i++;
 			}
 			cursor.close();
 			mAdapter.notifyDataSetChanged();
