@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,10 @@ public class PlayerActivity extends AppCompatActivity
 	private ImageButton playButton;
 	private ImageButton nextButton;
 
+	private TextView playingTitle;
+	private TextView playingAlbum;
+	private TextView playingArtist;
+
 	private PlayerService musicService;
 	private Intent playIntent;
 	private boolean musicBound = false;
@@ -57,6 +62,7 @@ public class PlayerActivity extends AppCompatActivity
 			musicService = binder.getService();
 			//pass list
 			musicService.setList(playlist);
+			musicService.onPlayListener(PlayerActivity.this);
 			musicBound = true;
 		}
 		@Override
@@ -76,6 +82,9 @@ public class PlayerActivity extends AppCompatActivity
 		previousButton = (ImageButton) findViewById(R.id.previousButton);
 		playButton = (ImageButton) findViewById(R.id.playPauseButton);
 		nextButton = (ImageButton) findViewById(R.id.nextButton);
+		playingTitle = (TextView) findViewById(R.id.playingTitle);
+		playingAlbum = (TextView) findViewById(R.id.playingAlbum);
+		playingArtist = (TextView) findViewById(R.id.playingArtist);
 		initButtons();
 
 		askPermission();
@@ -90,8 +99,8 @@ public class PlayerActivity extends AppCompatActivity
 
 	@Override
 	protected void onStart() {
-		// TODO no hacer al inicio
 		super.onStart();
+		// TODO no hacer al inicio
 		if (playIntent == null) {
 			playIntent = new Intent(this, PlayerService.class);
 			bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
@@ -132,7 +141,6 @@ public class PlayerActivity extends AppCompatActivity
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		// TODO poner las canciones que tenía el usuario antes
 		// initSongs();
 		// mAdapter.notifyDataSetChanged();
 	}
@@ -163,7 +171,25 @@ public class PlayerActivity extends AppCompatActivity
 				musicService.nextSong();
 			}
 		});
+	}
 
+	public void onStateChange(boolean play) {
+		if (play)
+			playButton.setImageResource(android.R.drawable.ic_media_pause);
+		else
+			playButton.setImageResource(android.R.drawable.ic_media_play);
+	}
+
+	public void onSongChange(Song newSong) {
+		// TODO
+		playingTitle.setText(newSong.getTitle());
+		playingAlbum.setText(newSong.getAlbum());
+		playingArtist.setText(newSong.getArtist());
+		String tmp = newSong.getAlbumArt();
+		if (tmp != null)
+			cover.setImageURI(Uri.parse(tmp));
+		else
+			cover.setImageResource(R.drawable.default_cover);
 	}
 
 	@Override
@@ -184,20 +210,24 @@ public class PlayerActivity extends AppCompatActivity
 					MediaStore.Audio.Media.TRACK
 			);
 
-			String tmp = data.getStringExtra("albumCover");
-			if (tmp != null)
-				cover.setImageURI(Uri.parse(tmp));
 			playlist.clear();
 			int i = 0;
 			while (cursor.moveToNext()) {
-				playlist.add(new Song(Uri.parse(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA)))));
-				playlist.get(i).setTitle(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
-				playlist.get(i).setDuration(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)));
+				Song newSong = new Song(Uri.parse(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))));
+				newSong.setTitle(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
+				newSong.setDuration(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION)));
+				newSong.setArtist(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST)));
+				newSong.setAlbum(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM)));
+				newSong.setAlbumArt(data.getStringExtra("albumCover"));
+				playlist.add(newSong);
 				i++;
 			}
 			cursor.close();
+			mAdapter.notifyDataSetChanged();
+			if (!musicService.isPlaying()) {
+				musicService.playSong(0);
+			}
 		}
-		mAdapter.notifyDataSetChanged();
 	}
 
 }

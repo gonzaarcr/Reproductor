@@ -30,12 +30,14 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.MyView
 		// each data item is just a string in this case
 		public TextView title;
 		public TextView duration;
+		public TextView playing;
 
 		public MyViewHolder(View v) {
 			super(v);
 			v.setOnClickListener(this);
 			title = (TextView) v.findViewById(R.id.title);
 			duration = (TextView) v.findViewById(R.id.duration);
+			playing = (TextView) v.findViewById(R.id.playing);
 		}
 
 		@Override

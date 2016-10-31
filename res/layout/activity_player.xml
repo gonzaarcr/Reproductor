@@ -1,75 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+				xmlns:app="http://schemas.android.com/apk/res-auto"
+				android:layout_width="match_parent"
+				android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/coverView"
-        android:layout_width="200dp"
-        android:layout_height="175dp"
-        app:srcCompat="@drawable/default_cover"
+	<ImageView
+		android:id="@+id/coverView"
+		android:layout_width="200dp"
+		android:layout_height="175dp"
+		app:srcCompat="@drawable/default_cover"
+		android:layout_alignParentTop="true"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentStart="true"/>
+
+	<android.support.v7.widget.RecyclerView
+		android:id="@+id/playlistView"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:layout_below="@+id/coverView"
+		android:layout_above="@+id/controlPanel"
+		android:layout_alignParentRight="true"
+		android:layout_alignParentEnd="true"
+		android:layout_alignParentLeft="true"
+		android:layout_alignParentStart="true"/>
+
+	<RelativeLayout
+		android:id="@+id/controlPanel"
+		android:layout_width="match_parent"
+		android:layout_height="60dp"
+		android:layout_alignParentBottom="true">
+
+		<ImageButton
+			android:id="@+id/colectionButton"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			app:srcCompat="@android:drawable/ic_menu_sort_by_size"
+			android:layout_alignParentLeft="true"
+			android:layout_centerVertical="true"/>
+
+		<ImageButton
+			android:text="Previous"
+			android:id="@+id/previousButton"
+			app:srcCompat="@android:drawable/ic_media_previous"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_centerVertical="true"
+			android:layout_alignBaseline="@+id/playPauseButton"
+			android:layout_alignBottom="@+id/playPauseButton"
+			android:layout_toLeftOf="@+id/playPauseButton"
+			android:layout_toStartOf="@+id/playPauseButton"/>
+
+		<ImageButton
+			android:text="Play"
+			android:id="@+id/playPauseButton"
+			app:srcCompat="@android:drawable/ic_media_play"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_centerVertical="true"
+			android:layout_centerHorizontal="true"/>
+
+		<ImageButton
+			android:text="Next"
+			android:id="@+id/nextButton"
+			app:srcCompat="@android:drawable/ic_media_next"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:layout_centerVertical="true"
+			android:layout_alignBaseline="@+id/playPauseButton"
+			android:layout_alignBottom="@+id/playPauseButton"
+			android:layout_toRightOf="@+id/playPauseButton"
+			android:layout_toEndOf="@+id/playPauseButton"/>
+	</RelativeLayout>
+
+    <TextView
+        android:id="@+id/playingTitle"
+        android:textSize="32dp"
+        android:textStyle="italic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"/>
+        android:layout_toRightOf="@+id/coverView"
+        android:layout_toEndOf="@+id/coverView"
+        android:layout_marginTop="35dp"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/playlistView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/coverView"
-        android:layout_above="@+id/controlPanel"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"/>
+    <TextView
+        android:id="@+id/playingAlbum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/playingTitle"
+        android:layout_toRightOf="@+id/coverView"
+        android:layout_toEndOf="@+id/coverView"/>
 
-    <RelativeLayout
-        android:id="@+id/controlPanel"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_alignParentBottom="true">
-
-        <ImageButton
-            android:id="@+id/colectionButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@android:drawable/ic_menu_sort_by_size"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"/>
-
-        <ImageButton
-            android:text="Previous"
-            android:id="@+id/previousButton"
-            app:srcCompat="@android:drawable/ic_media_previous"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_alignBaseline="@+id/playPauseButton"
-            android:layout_alignBottom="@+id/playPauseButton"
-            android:layout_toLeftOf="@+id/playPauseButton"
-            android:layout_toStartOf="@+id/playPauseButton"/>
-
-        <ImageButton
-            android:text="Play"
-            android:id="@+id/playPauseButton"
-            app:srcCompat="@android:drawable/ic_media_play"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"/>
-
-        <ImageButton
-            android:text="Next"
-            android:id="@+id/nextButton"
-            app:srcCompat="@android:drawable/ic_media_next"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_alignBaseline="@+id/playPauseButton"
-            android:layout_alignBottom="@+id/playPauseButton"
-            android:layout_toRightOf="@+id/playPauseButton"
-            android:layout_toEndOf="@+id/playPauseButton"/>
-    </RelativeLayout>
+    <TextView
+        android:id="@+id/playingArtist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/playingAlbum"
+        android:layout_toRightOf="@+id/coverView"
+        android:layout_toEndOf="@+id/coverView"/>
 
 </RelativeLayout>
