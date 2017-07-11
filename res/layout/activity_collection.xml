@@ -7,7 +7,7 @@
 	android:layout_height="match_parent"
 	android:paddingTop="16dp"
 	android:paddingBottom="16dp"
-	tools:context="com.example.gonza.reproductor.MainActivity">
+	tools:context="com.example.gonza.reproductor.CollectionActivity">
 
 	<android.support.v7.widget.RecyclerView
 		android:id="@+id/my_recycler_view"

@@ -9,13 +9,12 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity
+public class CollectionActivity extends AppCompatActivity
 		implements ColectionAdapter.OnItemClickListener,
 		ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -26,7 +25,7 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_collection);
 		mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
 
 		// use this setting to improve performance if you know that changes

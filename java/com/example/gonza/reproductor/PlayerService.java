@@ -1,6 +1,7 @@
 package com.example.gonza.reproductor;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.media.AudioManager;
@@ -9,6 +10,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -25,6 +27,8 @@ MediaPlayer.OnCompletionListener {
 	Song playing; // canción que se está tocando actualmente
 	boolean isPause = false;
 	List<Activity> observers = new ArrayList<>();
+
+	private int NOTIFICATION_ID = 1;
 
 	@Override
 	public void onCreate() {
@@ -89,6 +93,7 @@ MediaPlayer.OnCompletionListener {
 		}
 
 		emitStateChange(newState);
+		updateNotification(playing);
 		emitSongChange(playing);
 	}
 
@@ -121,7 +126,7 @@ MediaPlayer.OnCompletionListener {
 		mp.start();
 	}
 
-	public void setList(List<Song> theSongs){
+	public void setList(List<Song> theSongs) {
 		songs = theSongs;
 	}
 
@@ -153,10 +158,32 @@ MediaPlayer.OnCompletionListener {
 		}
 	}
 
+	/**
+	 * Avisa que cambió la canción a song. Puede que sea null,
+	 * (se detuvo).
+	 * @param song canción nueva
+	 */
 	private void emitSongChange(Song song) {
 		for (Activity a: observers) {
 			((PlayerActivity) a).onSongChange(song);
 		}
+	}
+
+	private void updateNotification(Song newSong) {
+		if (newSong == null) {
+			stopForeground(true);
+			return;
+		}
+		NotificationCompat.Builder mBuilder =
+				new NotificationCompat.Builder(this)
+						.setSmallIcon(R.mipmap.ic_launcher)
+						.setContentTitle(newSong.getTitle())
+						.setContentText("From "+ newSong.getAlbum() +" by "+ newSong.getArtist());
+		Intent notifyIntent = new Intent(this, PlayerActivity.class);
+		notifyIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, 0);
+		mBuilder.setContentIntent(pendingIntent);
+		startForeground(NOTIFICATION_ID, mBuilder.build());
 	}
 
 	public class MusicBinder extends Binder {

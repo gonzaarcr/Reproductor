@@ -14,6 +14,8 @@
         android:id="@+id/album_art"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:layout_alignTop="@id/elementButton"
+        android:layout_alignBottom="@id/elementButton"
         android:layout_marginRight="10dp"/>
 
     <TextView
@@ -21,6 +23,7 @@
         android:textSize="16dp"
         android:textStyle="bold"
         android:layout_toRightOf="@+id/album_art"
+        android:layout_toLeftOf="@+id/elementButton"
         android:layout_toEndOf="@+id/album_art"
         android:layout_alignParentTop="true"
         android:layout_width="match_parent"
@@ -30,18 +33,20 @@
         android:id="@+id/subtitle"
         android:layout_below="@id/title"
         android:layout_toRightOf="@+id/album_art"
+        android:layout_toLeftOf="@+id/album_art"
+        android:layout_alignLeft="@id/title"
+        android:layout_alignRight="@id/title"
         android:layout_toEndOf="@+id/album_art"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <ImageView
         android:id="@+id/elementButton"
+        android:src="@drawable/ic_menu_add"
         android:layout_width="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/title"
         android:layout_toEndOf="@+id/title"
-        android:layout_alignTop="@id/album_art"
-        android:layout_alignBottom="@id/album_art"
-        android:layout_height="@id/album_art"/>
+        android:layout_height="wrap_content"/>
 
 </RelativeLayout>

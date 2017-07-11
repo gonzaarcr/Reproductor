@@ -2,25 +2,22 @@ package com.example.gonza.reproductor;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -52,15 +49,13 @@ public class PlayerActivity extends AppCompatActivity
 	private boolean musicBound = false;
 
 	private final int PICK_ALBUM_REQUEST = 1;
-	private final int NOTIFICATION_ID = 1;
+	private final int READ_STORAGE_REQUEST = 2;
 
 	private ServiceConnection musicConnection = new ServiceConnection() {
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			PlayerService.MusicBinder binder = (PlayerService.MusicBinder)service;
-			//get service
 			musicService = binder.getService();
-			//pass list
 			musicService.setList(playlist);
 			musicService.onPlayListener(PlayerActivity.this);
 			musicBound = true;
@@ -100,7 +95,6 @@ public class PlayerActivity extends AppCompatActivity
 	@Override
 	protected void onStart() {
 		super.onStart();
-		// TODO no hacer al inicio
 		if (playIntent == null) {
 			playIntent = new Intent(this, PlayerService.class);
 			bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
@@ -132,24 +126,35 @@ public class PlayerActivity extends AppCompatActivity
 	}
 
 	private void askPermission() {
-		int REQUEST_WAKE_LOCK = 1;
+		int REQUEST_ALL = 1;
 		ActivityCompat.requestPermissions(this,
-				new String[] { Manifest.permission.WAKE_LOCK, Manifest.permission.READ_EXTERNAL_STORAGE },
-				REQUEST_WAKE_LOCK);
+				new String[] { Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WAKE_LOCK },
+				REQUEST_ALL);
 	}
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		// initSongs();
-		// mAdapter.notifyDataSetChanged();
+		if (requestCode == READ_STORAGE_REQUEST
+				&& grantResults.length > 0
+				&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+			colectionButton.performClick();
+		}
 	}
 
 	public void initButtons() {
 		colectionButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(PlayerActivity.this, MainActivity.class);
+				int permissionCheck = ContextCompat.checkSelfPermission(PlayerActivity.this,
+						Manifest.permission.READ_EXTERNAL_STORAGE);
+				if (permissionCheck == PackageManager.PERMISSION_DENIED) {
+					ActivityCompat.requestPermissions(PlayerActivity.this,
+							new String[] { Manifest.permission.READ_EXTERNAL_STORAGE },
+							READ_STORAGE_REQUEST);
+					return;
+				}
+				Intent intent = new Intent(PlayerActivity.this, CollectionActivity.class);
 				startActivityForResult(intent, PICK_ALBUM_REQUEST);
 			}
 		});
@@ -181,29 +186,24 @@ public class PlayerActivity extends AppCompatActivity
 	}
 
 	public void onSongChange(Song newSong) {
-		playingTitle.setText(newSong.getTitle());
-		playingAlbum.setText(newSong.getAlbum());
-		playingArtist.setText(newSong.getArtist());
-		String tmp = newSong.getAlbumArt();
-		if (tmp != null)
-			cover.setImageURI(Uri.parse(tmp));
-		else
+		String title = "";
+		String album = "";
+		String artist = "";
+		if (newSong != null) {
+			title = newSong.getTitle();
+			album = newSong.getAlbum();
+			artist = newSong.getArtist();
+			String tmp = newSong.getAlbumArt();
+			if (tmp != null)
+				cover.setImageURI(Uri.parse(tmp));
+			else
+				cover.setImageResource(R.drawable.default_cover);
+		} else {
 			cover.setImageResource(R.drawable.default_cover);
-		updateNotification(newSong);
-	}
-
-	private void updateNotification(Song newSong) {
-		NotificationCompat.Builder mBuilder =
-				new NotificationCompat.Builder(this)
-						.setSmallIcon(R.mipmap.ic_launcher)
-						.setContentTitle(newSong.getTitle())
-						.setContentText("From "+ newSong.getAlbum() +" by "+ newSong.getArtist());
-		NotificationManager mNotifyMgr = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-		Intent notifyIntent = new Intent(this, PlayerActivity.class);
-		notifyIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, 0);
-		mBuilder.setContentIntent(pendingIntent);
-		mNotifyMgr.notify(NOTIFICATION_ID, mBuilder.build());
+		}
+		playingTitle.setText(title);
+		playingAlbum.setText(album);
+		playingArtist.setText(artist);
 	}
 
 	@Override
