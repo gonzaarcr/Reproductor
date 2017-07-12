@@ -3,50 +3,64 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:focusable="true"
-    android:clickable="true"
-    android:padding="6dp">
+    android:orientation="vertical">
 
-    <ImageView
+    <!-- Dos sub-layouts para manejar mejor los clicks -->
+
+    <RelativeLayout
+        android:id="@+id/click_zone_1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:focusable="true"
+        android:clickable="true"
+        android:layout_toStartOf="@+id/click_zone_2"
+        android:layout_toLeftOf="@+id/click_zone_2">
+
+        <ImageView
+            android:id="@+id/album_art"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="10dp"/>
+
+        <TextView
+            android:id="@+id/title"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            android:layout_toRightOf="@+id/album_art"
+            android:layout_toEndOf="@+id/album_art"
+            android:layout_alignParentTop="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/subtitle"
+            android:layout_below="@id/title"
+            android:layout_toRightOf="@+id/album_art"
+            android:layout_alignLeft="@+id/title"
+            android:layout_alignRight="@+id/title"
+            android:layout_toEndOf="@+id/album_art"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/click_zone_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/album_art"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignTop="@id/elementButton"
-        android:layout_alignBottom="@id/elementButton"
-        android:layout_marginRight="10dp"/>
+        android:layout_alignBottom="@id/click_zone_1"
+        android:layout_alignTop="@id/click_zone_1"
+        android:layout_alignParentRight="true">
 
-    <TextView
-        android:id="@+id/title"
-        android:textSize="16dp"
-        android:textStyle="bold"
-        android:layout_toRightOf="@+id/album_art"
-        android:layout_toLeftOf="@+id/elementButton"
-        android:layout_toEndOf="@+id/album_art"
-        android:layout_alignParentTop="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/subtitle"
-        android:layout_below="@id/title"
-        android:layout_toRightOf="@+id/album_art"
-        android:layout_toLeftOf="@+id/album_art"
-        android:layout_alignLeft="@id/title"
-        android:layout_alignRight="@id/title"
-        android:layout_toEndOf="@+id/album_art"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <ImageView
-        android:id="@+id/elementButton"
-        android:src="@drawable/ic_menu_add"
-        android:layout_width="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_toRightOf="@+id/title"
-        android:layout_toEndOf="@+id/title"
-        android:layout_height="wrap_content"/>
+        <ImageView
+            android:id="@+id/elementButton"
+            android:src="@drawable/ic_menu_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="6dp"/>
+    </RelativeLayout>
 
 </RelativeLayout>

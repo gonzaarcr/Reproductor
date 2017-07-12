@@ -6,12 +6,40 @@
 
 	<ImageView
 		android:id="@+id/coverView"
-		android:layout_width="200dp"
-		android:layout_height="175dp"
+		android:layout_width="160dp"
+		android:layout_height="140dp"
 		app:srcCompat="@drawable/default_cover"
 		android:layout_alignParentTop="true"
 		android:layout_alignParentLeft="true"
-		android:layout_alignParentStart="true"/>
+		android:layout_alignParentStart="true"
+        android:layout_margin="6dp"/>
+
+    <TextView
+        android:id="@+id/playingTitle"
+        android:textSize="32sp"
+        android:textStyle="italic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/coverView"
+        android:layout_toEndOf="@+id/coverView"
+        android:layout_marginTop="35dp"/>
+
+    <TextView
+        android:id="@+id/playingAlbum"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/playingTitle"
+        android:layout_toRightOf="@+id/coverView"
+        android:layout_toEndOf="@+id/coverView"/>
+
+    <TextView
+        android:id="@+id/playingArtist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/playingAlbum"
+        android:layout_toRightOf="@+id/coverView"
+        android:layout_toEndOf="@+id/coverView"/>
 
 	<android.support.v7.widget.RecyclerView
 		android:id="@+id/playlistView"
@@ -71,32 +99,5 @@
 			android:layout_toRightOf="@+id/playPauseButton"
 			android:layout_toEndOf="@+id/playPauseButton"/>
 	</RelativeLayout>
-
-    <TextView
-        android:id="@+id/playingTitle"
-        android:textSize="32dp"
-        android:textStyle="italic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_toRightOf="@+id/coverView"
-        android:layout_toEndOf="@+id/coverView"
-        android:layout_marginTop="35dp"/>
-
-    <TextView
-        android:id="@+id/playingAlbum"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/playingTitle"
-        android:layout_toRightOf="@+id/coverView"
-        android:layout_toEndOf="@+id/coverView"/>
-
-    <TextView
-        android:id="@+id/playingArtist"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/playingAlbum"
-        android:layout_toRightOf="@+id/coverView"
-        android:layout_toEndOf="@+id/coverView"/>
 
 </RelativeLayout>

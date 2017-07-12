@@ -9,17 +9,21 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CollectionActivity extends AppCompatActivity
-		implements ColectionAdapter.OnItemClickListener,
-		ActivityCompat.OnRequestPermissionsResultCallback {
+		implements ActivityCompat.OnRequestPermissionsResultCallback,
+		BaseElementAdapter.ContentManager,
+		BaseElementAdapter.OnItemClickListener {
+
+	final String TAG = "CollectionActivity";
 
 	private RecyclerView mRecyclerView;
-	private ColectionAdapter mAdapter;
+	private BaseElementAdapter mAdapter;
 	private List<Song> myDataset = new ArrayList<>();
 
 	@Override
@@ -32,14 +36,14 @@ public class CollectionActivity extends AppCompatActivity
 		// in content do not change the layout size of the RecyclerView
 		mRecyclerView.setHasFixedSize(true);
 
-		// use a linear layout manager
 		RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
 		mRecyclerView.setLayoutManager(mLayoutManager);
 
 		initAlbums();
 
-		mAdapter = new ColectionAdapter(myDataset);
+		mAdapter = new BaseElementAdapter(myDataset);
 		mAdapter.setOnClickListener(this);
+		mAdapter.setContentManager(this);
 		mRecyclerView.setAdapter(mAdapter);
 	}
 
@@ -65,11 +69,26 @@ public class CollectionActivity extends AppCompatActivity
 
 	@Override
 	public void onClick(View view, int position) {
+		Intent r = createReturnIntent(position);
+		r.putExtra("clearPlaylist", true);
+		Log.d(TAG, "onClick");
+		finish();
+	}
+
+	@Override
+	public void onButtonClick(View view, int position) {
+		Intent r = createReturnIntent(position);
+		r.putExtra("clearPlaylist", false);
+		Log.d(TAG, "onButtonClick");
+		finish();
+	}
+
+	public Intent createReturnIntent(int position) {
 		Intent returnIntent = new Intent();
 		returnIntent.putExtra("album", myDataset.get(position).getAlbum());
 		returnIntent.putExtra("albumCover", myDataset.get(position).getAlbumArt());
 		setResult(Activity.RESULT_OK, returnIntent);
-		finish();
+		return returnIntent;
 	}
 
 	public void initAlbums() {
@@ -94,5 +113,29 @@ public class CollectionActivity extends AppCompatActivity
 			i++;
 		}
 		cursor.close();
+	}
+
+	/**
+	 * De BaseElementAdapter.ContentManager.
+	 */
+	@Override
+	public String getTitle(int position) {
+		return myDataset.get(position).getAlbum();
+	}
+
+	/**
+	 * De BaseElementAdapter.ContentManager.
+	 */
+	@Override
+	public String getSubtitle(int position) {
+		return myDataset.get(position).getArtist();
+	}
+
+	/**
+	 * De BaseElementAdapter.ContentManager.
+	 */
+	@Override
+	public String getAlbumArt(int position) {
+		return myDataset.get(position).getAlbumArt();
 	}
 }

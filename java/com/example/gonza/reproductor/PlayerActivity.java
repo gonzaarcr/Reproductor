@@ -27,13 +27,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerActivity extends AppCompatActivity
-		implements PlaylistAdapter.OnItemClickListener,
-		ActivityCompat.OnRequestPermissionsResultCallback {
+		implements ActivityCompat.OnRequestPermissionsResultCallback,
+		BaseElementAdapter.OnItemClickListener,
+		BaseElementAdapter.ContentManager {
 
 	private ImageView cover;
 	private List<Song> playlist = new ArrayList<>();
 	private RecyclerView playlistView;
-	private PlaylistAdapter mAdapter;
+	private BaseElementAdapter mAdapter;
 
 	private ImageButton colectionButton;
 	private ImageButton previousButton;
@@ -87,8 +88,10 @@ public class PlayerActivity extends AppCompatActivity
 		RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
 		playlistView.setLayoutManager(mLayoutManager);
 		playlistView.setHasFixedSize(true);
-		mAdapter = new PlaylistAdapter(playlist);
+		mAdapter = new BaseElementAdapter(playlist);
 		mAdapter.setOnClickListener(this);
+		mAdapter.setContentManager(this);
+		mAdapter.setRemoveButton(true);
 		playlistView.setAdapter(mAdapter);
 	}
 
@@ -118,11 +121,6 @@ public class PlayerActivity extends AppCompatActivity
 		unbindService(musicConnection);
 		musicService = null;
 		super.onDestroy();
-	}
-
-	@Override
-	public void onClick(View view, int position) {
-		musicService.playSong(position);
 	}
 
 	private void askPermission() {
@@ -224,7 +222,9 @@ public class PlayerActivity extends AppCompatActivity
 					MediaStore.Audio.Media.TRACK
 			);
 
-			playlist.clear();
+			if (data.getBooleanExtra("clearPlaylist", false))
+				playlist.clear();
+
 			while (cursor.moveToNext()) {
 				Song newSong = new Song(Uri.parse(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA))));
 				newSong.setTitle(cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE)));
@@ -242,4 +242,50 @@ public class PlayerActivity extends AppCompatActivity
 		}
 	}
 
+	/**
+	 * De BaseElementAdapter.OnClickListener. Actua como play/pausa.
+	 */
+	@Override
+	public void onClick(View view, int position) {
+		musicService.playSong(position);
+	}
+
+	/**
+	 * De BaseElementAdapter.OnClickListener. Saca la canción de la lista.
+	 */
+	@Override
+	public void onButtonClick(View view, int position) {
+		playlist.remove(position);
+		mAdapter.notifyDataSetChanged();
+	}
+
+	/**
+	 * De BaseElementAdapter.ContentManager.
+	 */
+	@Override
+	public String getTitle(int position) {
+		return playlist.get(position).getTitle();
+	}
+
+	/**
+	 * De BaseElementAdapter.ContentManager.
+	 * @return "Album - m:ss"
+	 */
+	@Override
+	public String getSubtitle(int position) {
+		long d = playlist.get(position).getDuration() / 1000;
+		String m = String.valueOf(d / 60);
+		String s = String.valueOf(d % 60);
+		s = s.length() == 1? "0" + s : s;
+		String album = playlist.get(position).getAlbum();
+		return album + " - " + m + ":" + s;
+	}
+
+	/**
+	 * De BaseElementAdapter.ContentManager.
+	 */
+	@Override
+	public String getAlbumArt(int position) {
+		return null;
+	}
 }
