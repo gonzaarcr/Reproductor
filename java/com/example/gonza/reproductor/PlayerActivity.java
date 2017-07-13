@@ -48,6 +48,7 @@ public class PlayerActivity extends AppCompatActivity
 	private TextView playingTitle;
 	private TextView playingAlbum;
 	private TextView playingArtist;
+	private Song currentTrack;
 
 	private PlayerService musicService;
 	private Intent playIntent;
@@ -190,6 +191,10 @@ public class PlayerActivity extends AppCompatActivity
 	public void onLyricsAction(MenuItem mi) {
 		// TODO iniciar activity con intent de canción actual
 		Log.d(TAG, "onLyricsAction");
+		Intent i = new Intent(PlayerActivity.this, LyricsActivity.class);
+		if (currentTrack != null)
+			i.putExtra("Track", currentTrack.getTitle());
+		startActivity(i);
 	}
 
 	public void onSaveAction(MenuItem mi) {
@@ -210,6 +215,7 @@ public class PlayerActivity extends AppCompatActivity
 		String title = "";
 		String album = "";
 		String artist = "";
+		currentTrack = newSong;
 		if (newSong != null) {
 			title = newSong.getTitle();
 			album = newSong.getAlbum();

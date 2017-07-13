@@ -3,9 +3,8 @@ package com.example.gonza.reproductor;
 import android.net.Uri;
 
 /**
- * Created by gonza on 12/10/16.
+ * DAO
  */
-
 public class Song {
 
 	private Uri uri;
