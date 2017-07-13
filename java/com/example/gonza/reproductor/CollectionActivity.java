@@ -10,6 +10,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -22,7 +24,6 @@ public class CollectionActivity extends AppCompatActivity
 
 	final String TAG = "CollectionActivity";
 
-	private RecyclerView mRecyclerView;
 	private BaseElementAdapter mAdapter;
 	private List<Song> myDataset = new ArrayList<>();
 
@@ -30,7 +31,7 @@ public class CollectionActivity extends AppCompatActivity
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_collection);
-		mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+		RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
 
 		// use this setting to improve performance if you know that changes
 		// in content do not change the layout size of the RecyclerView
@@ -67,11 +68,17 @@ public class CollectionActivity extends AppCompatActivity
 		super.onDestroy();
 	}
 
+	// Inflate the menu; this adds items to the action bar if it is present.
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.collection_menu, menu);
+		return true;
+	}
+
 	@Override
 	public void onClick(View view, int position) {
 		Intent r = createReturnIntent(position);
 		r.putExtra("clearPlaylist", true);
-		Log.d(TAG, "onClick");
 		finish();
 	}
 
@@ -79,8 +86,12 @@ public class CollectionActivity extends AppCompatActivity
 	public void onButtonClick(View view, int position) {
 		Intent r = createReturnIntent(position);
 		r.putExtra("clearPlaylist", false);
-		Log.d(TAG, "onButtonClick");
 		finish();
+	}
+
+	public void onSavedPlaylistAction(MenuItem mi) {
+		// TODO cargar listas guardadas
+		Log.d(TAG, "onSavedPlaylistAction");
 	}
 
 	public Intent createReturnIntent(int position) {

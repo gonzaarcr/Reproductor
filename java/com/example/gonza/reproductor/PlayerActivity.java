@@ -18,6 +18,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -31,9 +34,10 @@ public class PlayerActivity extends AppCompatActivity
 		BaseElementAdapter.OnItemClickListener,
 		BaseElementAdapter.ContentManager {
 
+	private final String TAG = "PlayerActivity";
+
 	private ImageView cover;
 	private List<Song> playlist = new ArrayList<>();
-	private RecyclerView playlistView;
 	private BaseElementAdapter mAdapter;
 
 	private ImageButton colectionButton;
@@ -73,7 +77,7 @@ public class PlayerActivity extends AppCompatActivity
 		setContentView(R.layout.activity_player);
 
 		cover = (ImageView) findViewById(R.id.coverView);
-		playlistView = (RecyclerView) findViewById(R.id.playlistView);
+		RecyclerView playlistView = (RecyclerView) findViewById(R.id.playlistView);
 		colectionButton = (ImageButton) findViewById(R.id.colectionButton);
 		previousButton = (ImageButton) findViewById(R.id.previousButton);
 		playButton = (ImageButton) findViewById(R.id.playPauseButton);
@@ -121,6 +125,13 @@ public class PlayerActivity extends AppCompatActivity
 		unbindService(musicConnection);
 		musicService = null;
 		super.onDestroy();
+	}
+
+	// Inflate the menu; this adds items to the action bar if it is present.
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.player_menu, menu);
+		return true;
 	}
 
 	private void askPermission() {
@@ -176,6 +187,16 @@ public class PlayerActivity extends AppCompatActivity
 		});
 	}
 
+	public void onLyricsAction(MenuItem mi) {
+		// TODO iniciar activity con intent de canción actual
+		Log.d(TAG, "onLyricsAction");
+	}
+
+	public void onSaveAction(MenuItem mi) {
+		// TODO mostrar pop-up para insertar nombre de la lista
+		Log.d(TAG, "onSaveAction");
+	}
+
 	public void onStateChange(boolean play) {
 		if (play)
 			playButton.setImageResource(android.R.drawable.ic_media_pause);
@@ -183,6 +204,8 @@ public class PlayerActivity extends AppCompatActivity
 			playButton.setImageResource(android.R.drawable.ic_media_play);
 	}
 
+	// TODO este y el de arriba tienen que ser con un local broadcast y
+	// los tiene que escuchar el widget, notificación  y letras.
 	public void onSongChange(Song newSong) {
 		String title = "";
 		String album = "";
@@ -255,6 +278,8 @@ public class PlayerActivity extends AppCompatActivity
 	 */
 	@Override
 	public void onButtonClick(View view, int position) {
+		// TODO falta testear, seguro hay bugs con las alternativas. Qué hacer cuando
+		// se saca una canción y se va a reproducir la siguiente, etc.
 		playlist.remove(position);
 		mAdapter.notifyDataSetChanged();
 	}
