@@ -4,9 +4,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.example.gonza.providers.Lololyrics;
+import com.example.gonza.providers.MusixmatchProvider;
+import com.example.gonza.providers.ProviderBase;
+
 public class LyricsActivity extends AppCompatActivity {
 
 	TextView title;
+	TextView body;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -14,8 +19,16 @@ public class LyricsActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_lyrics);
 
 		title = (TextView) findViewById(R.id.lyricsTitle);
+		body = (TextView) findViewById(R.id.lyrics);
 		String t = getIntent().getStringExtra("Track");
-		if (t != null)
+		if (t != null) {
 			title.setText(t);
+		}
+		ProviderBase mProv = new Lololyrics(this);
+		mProv.getLyrics(getIntent().getStringExtra("Artist"), t);
+	}
+
+	public void setLyrics(String lyrics) {
+		body.setText(lyrics);
 	}
 }
