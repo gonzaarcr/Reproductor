@@ -189,8 +189,6 @@ public class PlayerActivity extends AppCompatActivity
 	}
 
 	public void onLyricsAction(MenuItem mi) {
-		// TODO iniciar activity con intent de canción actual
-		Log.d(TAG, "onLyricsAction");
 		Intent i = new Intent(PlayerActivity.this, LyricsActivity.class);
 		if (currentTrack != null) {
 			i.putExtra("Track", currentTrack.getTitle());

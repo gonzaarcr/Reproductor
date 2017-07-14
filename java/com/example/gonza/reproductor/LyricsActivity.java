@@ -2,9 +2,11 @@ package com.example.gonza.reproductor;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
 import android.widget.TextView;
 
 import com.example.gonza.providers.Lololyrics;
+import com.example.gonza.providers.LyricsWikia;
 import com.example.gonza.providers.MusixmatchProvider;
 import com.example.gonza.providers.ProviderBase;
 
@@ -24,7 +26,7 @@ public class LyricsActivity extends AppCompatActivity {
 		if (t != null) {
 			title.setText(t);
 		}
-		ProviderBase mProv = new Lololyrics(this);
+		ProviderBase mProv = new LyricsWikia(this);
 		mProv.getLyrics(getIntent().getStringExtra("Artist"), t);
 	}
 

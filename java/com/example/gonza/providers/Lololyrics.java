@@ -40,6 +40,7 @@ public class Lololyrics extends ProviderBase {
 
 			int eventType = parser.nextTag();
 			while (eventType != XmlPullParser.END_DOCUMENT) {
+				/*
 				if (eventType == XmlPullParser.START_DOCUMENT) {
 					Log.d(TAG, "Start document");
 				} else if (eventType == XmlPullParser.START_TAG) {
@@ -49,6 +50,7 @@ public class Lololyrics extends ProviderBase {
 				} else if (eventType == XmlPullParser.TEXT) {
 					Log.d(TAG, "Text " + parser.getText());
 				}
+				*/
 				if (eventType == XmlPullParser.START_TAG
 						&& parser.getName().equals("response")) {
 					break;

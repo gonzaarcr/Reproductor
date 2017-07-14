@@ -29,6 +29,8 @@ public abstract class ProviderBase {
 	}
 
 	public String getLyrics(String artist, String track) {
+		// TODO pasar la cola a segundo plano
+		// https://developer.android.com/training/volley/index.html
 		String requestURL = getUrl(artist, track);
 		Log.d(TAG, "URL: " + requestURL);
 		RequestQueue queue = Volley.newRequestQueue(context);
@@ -36,7 +38,6 @@ public abstract class ProviderBase {
 				new Response.Listener<String>() {
 					@Override
 					public void onResponse(String response) {
-						Log.d(TAG, response);
 						context.setLyrics(parseResponse(response));
 					}
 				}, new Response.ErrorListener() {
