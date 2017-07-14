@@ -2,7 +2,6 @@ package com.example.gonza.reproductor;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Html;
 import android.widget.TextView;
 
 import com.example.gonza.providers.Lololyrics;
