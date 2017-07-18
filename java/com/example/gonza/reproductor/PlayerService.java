@@ -1,6 +1,5 @@
 package com.example.gonza.reproductor;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
@@ -15,18 +14,30 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class PlayerService extends Service implements
 MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
 MediaPlayer.OnCompletionListener {
 
+	private final String TAG = "PlayerService";
+
 	MediaPlayer musicPlayer;
 	private final IBinder musicBind = new MusicBinder();
-	private List<Song> songs;
+	private Vector<Song> songs = new Vector<>();
 	int songPos;
 	Song playing; // canción que se está tocando actualmente
-	boolean isPause = false;
-	List<Activity> observers = new ArrayList<>();
+	State currentState = State.STOP;
+	List<ServiceCallback> callbacks = new ArrayList<>();
+
+	public interface ServiceCallback {
+		void onStateChange(PlayerService.State newState);
+		void onSongChange(Song newSong);
+	}
+
+	public enum State {
+		PLAY, PAUSE, STOP
+	}
 
 	private int NOTIFICATION_ID = 1;
 
@@ -64,21 +75,15 @@ MediaPlayer.OnCompletionListener {
 	}
 
 	public void playSong(int position) {
-		boolean newState = false;
+		State newState = State.STOP;
 		if (position < 0 || position >= songs.size()) {
 			musicPlayer.stop();
 			playing = null;
-			newState = false;
+			newState = State.STOP;
 		} else if (position == songPos && songs.get(position) == playing) {
-			if (musicPlayer.isPlaying()) {
-				musicPlayer.pause();
-				isPause = true;
-				newState = false;
-			} else if (isPause) {
-				musicPlayer.start();
-				isPause = false;
-				newState = true;
-			}
+			musicPlayer.reset();
+			musicPlayer.start();
+			newState = State.PLAY;
 		} else {
 			songPos = position;
 			playing = songs.get(songPos);
@@ -86,12 +91,12 @@ MediaPlayer.OnCompletionListener {
 				musicPlayer.reset();
 				musicPlayer.setDataSource(getApplicationContext(), playing.getUri());
 				musicPlayer.prepareAsync();
-				newState = true;
+				newState = State.PLAY;
 			} catch (Exception e) {
-				Log.e("MUSIC SERVICE", "Error setting data source", e);
+				Log.e(TAG, "Error setting data source", e);
 			}
 		}
-
+		currentState = newState;
 		emitStateChange(newState);
 		updateNotification(playing);
 		emitSongChange(playing);
@@ -100,17 +105,28 @@ MediaPlayer.OnCompletionListener {
 	public void playPause() {
 		if (musicPlayer.isPlaying()) {
 			musicPlayer.pause();
-			isPause = true;
-			emitStateChange(false);
-		} else if (isPause) {
+			currentState = State.PAUSE;
+			emitStateChange(currentState);
+		} else if (currentState == State.PAUSE || currentState == State.STOP) {
 			musicPlayer.start();
-			isPause = false;
-			emitStateChange(true);
+			currentState = State.PLAY;
+			emitStateChange(currentState);
+		} else {
+			Log.e(TAG, "Busy State");
 		}
 	}
 
-	public boolean isPlaying() {
-		return musicPlayer.isPlaying();
+	public void stop() {
+		musicPlayer.stop();
+		playing = null;
+		currentState = State.STOP;
+		emitStateChange(currentState);
+		emitSongChange(playing);
+		updateNotification(playing);
+	}
+
+	public State getState() {
+		return currentState;
 	}
 
 	public void nextSong() {
@@ -126,8 +142,19 @@ MediaPlayer.OnCompletionListener {
 		mp.start();
 	}
 
-	public void setList(List<Song> theSongs) {
-		songs = theSongs;
+	public void setList(Vector<Song> songs) {
+		this.songs = songs;
+		songPos = 0;
+	}
+
+	public void appendSongs(Vector<Song> list) {
+		songs.addAll(list);
+	}
+
+	public void removeSong(int position) {
+		songs.remove(position);
+		if (position <= songPos)
+			songPos--;
 	}
 
 	@Override
@@ -137,24 +164,24 @@ MediaPlayer.OnCompletionListener {
 
 	@Override
 	public boolean onError(MediaPlayer mp, int what, int extra) {
-		System.err.println(String.valueOf(what) + " extra: " + extra);
+		Log.e(TAG, String.valueOf(what) + " extra: " + extra);
 		return false;
 	}
 
 	/**
 	 * Setea a los que escuchan los cambios de play/pause.
 	 */
-	public void onPlayListener(Activity observer) {
-		observers.add(observer);
+	public void onPlayListener(ServiceCallback callback) {
+		callbacks.add(callback);
 	}
 
 	/*
 	 * Avisa que cambio el estado play/pause.
 	 * @param play true si cambio a play, false a pause
 	 */
-	private void emitStateChange(boolean play) {
-		for (Activity a: observers) {
-			((PlayerActivity) a).onStateChange(play);
+	private void emitStateChange(State state) {
+		for (ServiceCallback c: callbacks) {
+			c.onStateChange(state);
 		}
 	}
 
@@ -164,8 +191,8 @@ MediaPlayer.OnCompletionListener {
 	 * @param song canción nueva
 	 */
 	private void emitSongChange(Song song) {
-		for (Activity a: observers) {
-			((PlayerActivity) a).onSongChange(song);
+		for (ServiceCallback c: callbacks) {
+			c.onSongChange(song);
 		}
 	}
 
