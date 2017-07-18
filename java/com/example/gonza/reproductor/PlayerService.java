@@ -1,16 +1,27 @@
 package com.example.gonza.reproductor;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import com.example.gonza.widget.MyNotification;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +30,12 @@ import java.util.Vector;
 public class PlayerService extends Service implements
 MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
 MediaPlayer.OnCompletionListener {
+
+	public static final String APP_PKG = "com.example.gonza";
+	public static String ACTION_BACKWARD = APP_PKG + ".Backward";
+	public static String ACTION_PLAYPAUSE = APP_PKG + ".PlayPause";
+	public static String ACTION_STOP = APP_PKG + ".Stop";
+	public static String ACTION_FORDWARD = APP_PKG + ".Forward";
 
 	private final String TAG = "PlayerService";
 
@@ -30,6 +47,14 @@ MediaPlayer.OnCompletionListener {
 	State currentState = State.STOP;
 	List<ServiceCallback> callbacks = new ArrayList<>();
 
+	MyNotification notification;
+
+	BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Log.d(TAG, "BroadCast received: " + intent.getAction());
+		}
+	};
 	public interface ServiceCallback {
 		void onStateChange(PlayerService.State newState);
 		void onSongChange(Song newSong);
@@ -39,13 +64,19 @@ MediaPlayer.OnCompletionListener {
 		PLAY, PAUSE, STOP
 	}
 
-	private int NOTIFICATION_ID = 1;
-
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		musicPlayer = new MediaPlayer();
 		initMusicPlayer();
+
+		// Registra el broadcast receiver
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(ACTION_BACKWARD);
+		filter.addAction(ACTION_PLAYPAUSE);
+		filter.addAction(ACTION_STOP);
+		filter.addAction(ACTION_FORDWARD);
+		registerReceiver(broadcastReceiver, filter);
 	}
 
 	private void initMusicPlayer() {
@@ -81,7 +112,7 @@ MediaPlayer.OnCompletionListener {
 			playing = null;
 			newState = State.STOP;
 		} else if (position == songPos && songs.get(position) == playing) {
-			musicPlayer.reset();
+			musicPlayer.seekTo(0);
 			musicPlayer.start();
 			newState = State.PLAY;
 		} else {
@@ -97,9 +128,8 @@ MediaPlayer.OnCompletionListener {
 			}
 		}
 		currentState = newState;
-		emitStateChange(newState);
-		updateNotification(playing);
 		emitSongChange(playing);
+		emitStateChange(newState);
 	}
 
 	public void playPause() {
@@ -112,7 +142,7 @@ MediaPlayer.OnCompletionListener {
 			currentState = State.PLAY;
 			emitStateChange(currentState);
 		} else {
-			Log.e(TAG, "Busy State");
+			Log.e(TAG, "Weird state");
 		}
 	}
 
@@ -120,9 +150,8 @@ MediaPlayer.OnCompletionListener {
 		musicPlayer.stop();
 		playing = null;
 		currentState = State.STOP;
-		emitStateChange(currentState);
 		emitSongChange(playing);
-		updateNotification(playing);
+		emitStateChange(currentState);
 	}
 
 	public State getState() {
@@ -194,23 +223,22 @@ MediaPlayer.OnCompletionListener {
 		for (ServiceCallback c: callbacks) {
 			c.onSongChange(song);
 		}
+		updateNotification(song);
 	}
 
 	private void updateNotification(Song newSong) {
 		if (newSong == null) {
 			stopForeground(true);
+			callbacks.remove(notification);
+			notification = null;
 			return;
+		} else {
+			if (notification == null) {
+				notification = new MyNotification(this, newSong);
+				callbacks.add(notification);
+			}
+			startForeground(notification.getId(), notification.build());
 		}
-		NotificationCompat.Builder mBuilder =
-				new NotificationCompat.Builder(this)
-						.setSmallIcon(R.mipmap.ic_launcher)
-						.setContentTitle(newSong.getTitle())
-						.setContentText("From "+ newSong.getAlbum() +" by "+ newSong.getArtist());
-		Intent notifyIntent = new Intent(this, PlayerActivity.class);
-		notifyIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, 0);
-		mBuilder.setContentIntent(pendingIntent);
-		startForeground(NOTIFICATION_ID, mBuilder.build());
 	}
 
 	public class MusicBinder extends Binder {
