@@ -43,8 +43,6 @@ public abstract class ProviderBase {
 		if (artist == null || track == null)
 			return false;
 
-		String lyric = new String();
-		Log.d(TAG, "Trying cache");
 		if (localCache.getLyrics(artist, track)) {
 			Log.d(TAG, "Cache hit");
 			return true;
@@ -86,6 +84,7 @@ public abstract class ProviderBase {
 			FileOutputStream out = new FileOutputStream(f);
 			out.write(lyric.getBytes());
 			out.close();
+			Log.d(TAG, "saved in chace " + track);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

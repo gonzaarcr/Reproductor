@@ -1,7 +1,6 @@
 package com.example.gonza.providers;
 
 import android.net.Uri;
-import android.util.Log;
 
 import com.example.gonza.reproductor.LyricsActivity;
 

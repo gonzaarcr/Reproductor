@@ -24,7 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/lyricsTitle"
-            android:text="Body"
+            android:text="Searching..."
             android:textSize="12sp"
 	        android:layout_marginTop="12dp"/>
 

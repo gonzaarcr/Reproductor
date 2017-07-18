@@ -75,6 +75,11 @@ public class CollectionActivity extends AppCompatActivity
 		return true;
 	}
 
+	/**
+	 * Reemplaa la lista actual por el álbum seleccionado
+	 * @param view
+	 * @param position
+	 */
 	@Override
 	public void onClick(View view, int position) {
 		Intent r = createReturnIntent(position);
@@ -82,6 +87,11 @@ public class CollectionActivity extends AppCompatActivity
 		finish();
 	}
 
+	/**
+	 * Agrega a la lista actual el album seleccionado (al final).
+	 * @param view
+	 * @param position
+	 */
 	@Override
 	public void onButtonClick(View view, int position) {
 		Intent r = createReturnIntent(position);

@@ -26,21 +26,22 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Vector;
 
 public class PlayerActivity extends AppCompatActivity
 		implements ActivityCompat.OnRequestPermissionsResultCallback,
 		BaseElementAdapter.OnItemClickListener,
-		BaseElementAdapter.ContentManager {
+		BaseElementAdapter.ContentManager,
+		PlayerService.ServiceCallback {
 
 	private final String TAG = "PlayerActivity";
 
 	private ImageView cover;
-	private List<Song> playlist = new ArrayList<>();
+	private Vector<Song> playlist = new Vector<>();
 	private BaseElementAdapter mAdapter;
 
 	private ImageButton colectionButton;
+	private ImageButton stopButton;
 	private ImageButton previousButton;
 	private ImageButton playButton;
 	private ImageButton nextButton;
@@ -79,6 +80,7 @@ public class PlayerActivity extends AppCompatActivity
 
 		cover = (ImageView) findViewById(R.id.coverView);
 		RecyclerView playlistView = (RecyclerView) findViewById(R.id.playlistView);
+		stopButton = (ImageButton) findViewById(R.id.stopButton);
 		colectionButton = (ImageButton) findViewById(R.id.colectionButton);
 		previousButton = (ImageButton) findViewById(R.id.previousButton);
 		playButton = (ImageButton) findViewById(R.id.playPauseButton);
@@ -168,6 +170,12 @@ public class PlayerActivity extends AppCompatActivity
 				startActivityForResult(intent, PICK_ALBUM_REQUEST);
 			}
 		});
+		stopButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				musicService.stop();
+			}
+		});
 		previousButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -202,15 +210,20 @@ public class PlayerActivity extends AppCompatActivity
 		Log.d(TAG, "onSaveAction");
 	}
 
-	public void onStateChange(boolean play) {
-		if (play)
-			playButton.setImageResource(android.R.drawable.ic_media_pause);
-		else
-			playButton.setImageResource(android.R.drawable.ic_media_play);
+	public void onStateChange(PlayerService.State state) {
+		switch (state) {
+			case PLAY:
+				playButton.setImageResource(android.R.drawable.ic_media_pause);
+				break;
+			case PAUSE:
+				playButton.setImageResource(android.R.drawable.ic_media_play);
+				break;
+			case STOP:
+				playButton.setImageResource(android.R.drawable.ic_media_play);
+				break;
+		}
 	}
 
-	// TODO este y el de arriba tienen que ser con un local broadcast y
-	// los tiene que escuchar el widget, notificación  y letras.
 	public void onSongChange(Song newSong) {
 		String title = "";
 		String album = "";
@@ -265,7 +278,8 @@ public class PlayerActivity extends AppCompatActivity
 			}
 			cursor.close();
 			mAdapter.notifyDataSetChanged();
-			if (!musicService.isPlaying()) {
+			if (data.getBooleanExtra("clearPlaylist", false)
+					&& musicService.getState() != PlayerService.State.PLAY) {
 				musicService.playSong(0);
 			}
 		}
@@ -284,9 +298,7 @@ public class PlayerActivity extends AppCompatActivity
 	 */
 	@Override
 	public void onButtonClick(View view, int position) {
-		// TODO falta testear, seguro hay bugs con las alternativas. Qué hacer cuando
-		// se saca una canción y se va a reproducir la siguiente, etc.
-		playlist.remove(position);
+		musicService.removeSong(position);
 		mAdapter.notifyDataSetChanged();
 	}
 
