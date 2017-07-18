@@ -175,10 +175,6 @@ MediaPlayer.OnCompletionListener {
 		songPos = 0;
 	}
 
-	public void appendSongs(Vector<Song> list) {
-		songs.addAll(list);
-	}
-
 	public void removeSong(int position) {
 		songs.remove(position);
 		if (position <= songPos)
@@ -230,7 +226,6 @@ MediaPlayer.OnCompletionListener {
 			stopForeground(true);
 			callbacks.remove(notification);
 			notification = null;
-			return;
 		} else {
 			if (notification == null) {
 				notification = new MyNotification(this, newSong);

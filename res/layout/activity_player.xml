@@ -23,7 +23,7 @@
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@+id/coverView"
         android:layout_toEndOf="@+id/coverView"
-        android:layout_marginTop="35dp"/>
+        android:layout_marginTop="12dp"/>
 
     <TextView
         android:id="@+id/playingAlbum"
@@ -45,6 +45,7 @@
 		android:id="@+id/playlistView"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
+		android:scrollbars="vertical"
 		android:layout_below="@+id/coverView"
 		android:layout_above="@+id/controlPanel"
 		android:layout_alignParentRight="true"

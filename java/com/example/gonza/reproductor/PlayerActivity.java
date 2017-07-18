@@ -2,7 +2,6 @@ package com.example.gonza.reproductor;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -71,13 +70,6 @@ public class PlayerActivity extends AppCompatActivity
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
 			musicBound = false;
-		}
-	};
-
-	BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-
 		}
 	};
 
