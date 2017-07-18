@@ -1,24 +1,17 @@
 package com.example.gonza.reproductor;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.example.gonza.widget.MyNotification;
@@ -32,10 +25,10 @@ MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
 MediaPlayer.OnCompletionListener {
 
 	public static final String APP_PKG = "com.example.gonza";
-	public static String ACTION_BACKWARD = APP_PKG + ".Backward";
-	public static String ACTION_PLAYPAUSE = APP_PKG + ".PlayPause";
-	public static String ACTION_STOP = APP_PKG + ".Stop";
-	public static String ACTION_FORDWARD = APP_PKG + ".Forward";
+	public static final String ACTION_BACKWARD = APP_PKG + ".Backward";
+	public static final String ACTION_PLAYPAUSE = APP_PKG + ".PlayPause";
+	public static final String ACTION_STOP = APP_PKG + ".Stop";
+	public static final String ACTION_FORDWARD = APP_PKG + ".Forward";
 
 	private final String TAG = "PlayerService";
 
@@ -52,9 +45,15 @@ MediaPlayer.OnCompletionListener {
 	BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Log.d(TAG, "BroadCast received: " + intent.getAction());
+			switch (intent.getAction()) {
+				case ACTION_BACKWARD: previousSong(); break;
+				case ACTION_PLAYPAUSE: playPause(); break;
+				case ACTION_STOP: stop(); break;
+				case ACTION_FORDWARD: nextSong(); break;
+			}
 		}
 	};
+
 	public interface ServiceCallback {
 		void onStateChange(PlayerService.State newState);
 		void onSongChange(Song newSong);
@@ -137,12 +136,12 @@ MediaPlayer.OnCompletionListener {
 			musicPlayer.pause();
 			currentState = State.PAUSE;
 			emitStateChange(currentState);
-		} else if (currentState == State.PAUSE || currentState == State.STOP) {
+		} else if (currentState == State.PAUSE) {
 			musicPlayer.start();
 			currentState = State.PLAY;
 			emitStateChange(currentState);
-		} else {
-			Log.e(TAG, "Weird state");
+		} else if (currentState == State.STOP) {
+			playSong(songPos);
 		}
 	}
 

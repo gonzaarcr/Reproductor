@@ -5,9 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
 import com.example.gonza.reproductor.PlayerActivity;
@@ -49,12 +47,12 @@ public class MyNotification implements PlayerService.ServiceCallback {
 
 		Intent iBackward = new Intent(ACTION_BACKWARD);
 		Intent iPlay = new Intent(ACTION_PLAYPAUSE);
-		Intent iStop = new Intent(ACTION_STOP);
+		// Intent iStop = new Intent(ACTION_STOP); // El stop no entra, solo muestra 3
 		Intent iForward = new Intent(ACTION_FORDWARD);
 
 		PendingIntent piBackward = PendingIntent.getBroadcast(context, 0, iBackward, PendingIntent.FLAG_UPDATE_CURRENT);
 		PendingIntent piPlay = PendingIntent.getBroadcast(context, 0, iPlay, PendingIntent.FLAG_UPDATE_CURRENT);
-		PendingIntent piStop = PendingIntent.getBroadcast(context, 0, iStop, PendingIntent.FLAG_UPDATE_CURRENT);
+		// PendingIntent piStop = PendingIntent.getBroadcast(context, 0, iStop, PendingIntent.FLAG_UPDATE_CURRENT);
 		PendingIntent piForward = PendingIntent.getBroadcast(context, 0, iForward, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		setCover(song);
@@ -62,6 +60,7 @@ public class MyNotification implements PlayerService.ServiceCallback {
 		mBuilder.addAction(R.drawable.ic_media_backward, "previous", piBackward);
 		mBuilder.addAction(R.drawable.ic_media_pause, "pause", piPlay);
 		mBuilder.addAction(R.drawable.ic_media_fordward, "next", piForward);
+		// mBuilder.addAction(R.drawable.ic_media_stop, "stop", piStop);
 	}
 
 	/**
@@ -112,7 +111,7 @@ public class MyNotification implements PlayerService.ServiceCallback {
 	}
 
 	private void setCover(Song song) {
-		if (song.getAlbumArt() == null) {
+		if (song.getAlbumArt() != null) {
 			mBuilder.setLargeIcon(BitmapFactory.decodeFile(song.getAlbumArt()));
 		} else {
 			mBuilder.setLargeIcon(BitmapFactory.decodeResource(
