@@ -104,6 +104,12 @@ MediaPlayer.OnCompletionListener {
 		return false;
 	}
 
+	@Override
+	public void onDestroy() {
+		unregisterReceiver(broadcastReceiver);
+		super.onDestroy();
+	}
+
 	public void playSong(int position) {
 		State newState = State.STOP;
 		if (position < 0 || position >= songs.size()) {

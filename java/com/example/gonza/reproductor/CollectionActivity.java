@@ -14,8 +14,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.util.Arrays;
+import java.util.Vector;
 
 public class CollectionActivity extends AppCompatActivity
 		implements ActivityCompat.OnRequestPermissionsResultCallback,
@@ -24,27 +27,57 @@ public class CollectionActivity extends AppCompatActivity
 
 	final String TAG = "CollectionActivity";
 
+	private RecyclerView mRecyclerView;
+
+	// Lista de albumes
 	private BaseElementAdapter mAdapter;
-	private List<Song> myDataset = new ArrayList<>();
+	private final Vector<Song> myDataset = new Vector<>();
+
+	// Listas guardadas
+	private BaseElementAdapter mPlaylistAdapter;
+	private final Vector<Song> mPlaylistDataset = new Vector<>();
+
+	private boolean isInPlaylistView = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_collection);
-		RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+		mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
 
-		// use this setting to improve performance if you know that changes
-		// in content do not change the layout size of the RecyclerView
 		mRecyclerView.setHasFixedSize(true);
-
 		RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
 		mRecyclerView.setLayoutManager(mLayoutManager);
 
+		setTitle("Collection");
 		initAlbums();
+		initSavedPlaylist();
+
+		mPlaylistAdapter = new BaseElementAdapter(mPlaylistDataset);
+		mPlaylistAdapter.setOnClickListener(this);
+		mPlaylistAdapter.setContentManager(new BaseElementAdapter.ContentManager() {
+			@Override
+			public String getTitle(int position) {
+				return mPlaylistDataset.get(position).getAlbum();
+			}
+
+			@Override
+			public String getSubtitle(int position) {
+				return null;
+			}
+
+			@Override
+			public String getAlbumArt(int position) {
+				return null;
+			}
+		});
+		mPlaylistAdapter.setRemoveButton(true);
+		mPlaylistAdapter.notifyDataSetChanged();
 
 		mAdapter = new BaseElementAdapter(myDataset);
 		mAdapter.setOnClickListener(this);
 		mAdapter.setContentManager(this);
+		mAdapter.notifyDataSetChanged();
 		mRecyclerView.setAdapter(mAdapter);
 	}
 
@@ -88,26 +121,68 @@ public class CollectionActivity extends AppCompatActivity
 	}
 
 	/**
-	 * Agrega a la lista actual el album seleccionado (al final).
+	 * Agrega a la lista actual el album seleccionado (al final), o
+	 * elimina la lista guardada, según corresponda.
 	 * @param view
 	 * @param position
 	 */
 	@Override
 	public void onButtonClick(View view, int position) {
-		Intent r = createReturnIntent(position);
-		r.putExtra("clearPlaylist", false);
-		finish();
+		if (!isInPlaylistView) {
+			Intent r = createReturnIntent(position);
+			r.putExtra("clearPlaylist", false);
+			finish();
+		} else {
+			removePlaylist(position);
+		}
+	}
+
+	private void removePlaylist(int position) {
+		String filename = myDataset.get(position).getAlbum() + ".m3u";
+		mPlaylistDataset.remove(position);
+		mPlaylistAdapter.notifyDataSetChanged();
+		File file = new File(getFilesDir(), filename);
+		file.delete();
 	}
 
 	public void onSavedPlaylistAction(MenuItem mi) {
-		// TODO cargar listas guardadas
-		Log.d(TAG, "onSavedPlaylistAction");
+		if (!isInPlaylistView) {
+			isInPlaylistView = true;
+			mRecyclerView.setAdapter(mPlaylistAdapter);
+			setTitle("Saved");
+		} else {
+			isInPlaylistView = false;
+			mRecyclerView.setAdapter(mAdapter);
+			setTitle("Collection");
+		}
 	}
 
 	public Intent createReturnIntent(int position) {
 		Intent returnIntent = new Intent();
-		returnIntent.putExtra("album", myDataset.get(position).getAlbum());
-		returnIntent.putExtra("albumCover", myDataset.get(position).getAlbumArt());
+
+		returnIntent.putExtra("isAlbum", !isInPlaylistView);
+		if (!isInPlaylistView) {
+			returnIntent.putExtra("album", myDataset.get(position).getAlbum());
+			returnIntent.putExtra("albumCover", myDataset.get(position).getAlbumArt());
+		} else {
+			Vector<String> tmp = new Vector<>();
+			try {
+				File f = new File(getFilesDir(), mPlaylistDataset.get(position).getAlbum() + ".m3u");
+				BufferedReader br;
+				br = new BufferedReader(new FileReader(f));
+				String line = br.readLine();
+				while (line != null) {
+					tmp.add(line);
+					line = br.readLine();
+				}
+			} catch (Exception e) {}
+
+			String[] savedPlaylist = new String[tmp.size()];
+			tmp.toArray(savedPlaylist);
+			Log.d(TAG, "savedPlalist: " + Arrays.toString(savedPlaylist));
+			returnIntent.putExtra("savedPlaylist", savedPlaylist);
+		}
+
 		setResult(Activity.RESULT_OK, returnIntent);
 		return returnIntent;
 	}
@@ -123,7 +198,7 @@ public class CollectionActivity extends AppCompatActivity
 				projection,
 				null, null, null
 		);
-		myDataset = new ArrayList<>();
+
 		int i = 0;
 		while (cursor.moveToNext()) {
 			myDataset.add(new Song());
@@ -134,6 +209,17 @@ public class CollectionActivity extends AppCompatActivity
 			i++;
 		}
 		cursor.close();
+	}
+
+	private void initSavedPlaylist() {
+		File[] files = getFilesDir().listFiles();
+		for (File f: files) {
+			if (f.getName().endsWith(".m3u")) {
+				Song s = new Song();
+				s.setAlbum(f.getName().substring(0, f.getName().length() - 4));
+				mPlaylistDataset.add(s);
+			}
+		}
 	}
 
 	/**
