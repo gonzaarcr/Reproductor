@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -15,7 +16,9 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.gonza.widget.MyNotification;
+import com.example.gonza.widget.Widget;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -213,6 +216,10 @@ MediaPlayer.OnCompletionListener {
 		for (ServiceCallback c: callbacks) {
 			c.onStateChange(state);
 		}
+		Intent i = new Intent(this, Widget.class);
+		i.setAction("stateChange");
+		i.putExtra("state", state);
+		sendBroadcast(i);
 	}
 
 	/**
@@ -225,6 +232,14 @@ MediaPlayer.OnCompletionListener {
 			c.onSongChange(song);
 		}
 		updateNotification(song);
+		if (song != null) {
+			Intent i = new Intent(this, Widget.class);
+			i.setAction("songChange");
+			i.putExtra("artist", song.getArtist());
+			i.putExtra("songName", song.getTitle());
+			i.putExtra("albumArt", song.getAlbumArt());
+			sendBroadcast(i);
+		}
 	}
 
 	private void updateNotification(Song newSong) {

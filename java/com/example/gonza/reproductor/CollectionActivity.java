@@ -72,12 +72,10 @@ public class CollectionActivity extends AppCompatActivity
 			}
 		});
 		mPlaylistAdapter.setRemoveButton(true);
-		mPlaylistAdapter.notifyDataSetChanged();
 
 		mAdapter = new BaseElementAdapter(myDataset);
 		mAdapter.setOnClickListener(this);
 		mAdapter.setContentManager(this);
-		mAdapter.notifyDataSetChanged();
 		mRecyclerView.setAdapter(mAdapter);
 	}
 
