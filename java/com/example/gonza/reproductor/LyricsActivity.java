@@ -24,9 +24,12 @@ public class LyricsActivity extends AppCompatActivity {
 		String t = getIntent().getStringExtra("Track");
 		if (t != null) {
 			title.setText(t);
+			ProviderBase mProv = new LyricsWikia(this);
+			mProv.getLyrics(getIntent().getStringExtra("Artist"), t);
+		} else {
+			title.setText("");
+			body.setText("Nada que mostrar");
 		}
-		ProviderBase mProv = new LyricsWikia(this);
-		mProv.getLyrics(getIntent().getStringExtra("Artist"), t);
 	}
 
 	public void setLyrics(String lyrics) {

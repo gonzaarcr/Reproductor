@@ -16,7 +16,6 @@ import com.example.gonza.reproductor.Song;
 import static com.example.gonza.reproductor.PlayerService.ACTION_BACKWARD;
 import static com.example.gonza.reproductor.PlayerService.ACTION_FORDWARD;
 import static com.example.gonza.reproductor.PlayerService.ACTION_PLAYPAUSE;
-import static com.example.gonza.reproductor.PlayerService.ACTION_STOP;
 
 public class MyNotification implements PlayerService.ServiceCallback {
 ;
@@ -33,7 +32,6 @@ public class MyNotification implements PlayerService.ServiceCallback {
 	 */
 	public MyNotification(Context context, Song song) {
 		this.context = context;
-		PlayerService.State state = PlayerService.State.PLAY;
 
 		mBuilder = new NotificationCompat.Builder(context)
 				.setSmallIcon(R.mipmap.ic_launcher)
@@ -47,12 +45,10 @@ public class MyNotification implements PlayerService.ServiceCallback {
 
 		Intent iBackward = new Intent(ACTION_BACKWARD);
 		Intent iPlay = new Intent(ACTION_PLAYPAUSE);
-		// Intent iStop = new Intent(ACTION_STOP); // El stop no entra, solo muestra 3
 		Intent iForward = new Intent(ACTION_FORDWARD);
 
 		PendingIntent piBackward = PendingIntent.getBroadcast(context, 0, iBackward, PendingIntent.FLAG_UPDATE_CURRENT);
 		PendingIntent piPlay = PendingIntent.getBroadcast(context, 0, iPlay, PendingIntent.FLAG_UPDATE_CURRENT);
-		// PendingIntent piStop = PendingIntent.getBroadcast(context, 0, iStop, PendingIntent.FLAG_UPDATE_CURRENT);
 		PendingIntent piForward = PendingIntent.getBroadcast(context, 0, iForward, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		setCover(song);
@@ -60,7 +56,6 @@ public class MyNotification implements PlayerService.ServiceCallback {
 		mBuilder.addAction(R.drawable.ic_media_backward, "previous", piBackward);
 		mBuilder.addAction(R.drawable.ic_media_pause, "pause", piPlay);
 		mBuilder.addAction(R.drawable.ic_media_fordward, "next", piForward);
-		// mBuilder.addAction(R.drawable.ic_media_stop, "stop", piStop);
 	}
 
 	/**
@@ -95,8 +90,7 @@ public class MyNotification implements PlayerService.ServiceCallback {
 		if (song == null)
 			return;
 
-		mBuilder.setSmallIcon(R.mipmap.ic_launcher)
-				.setContentTitle(song.getTitle())
+		mBuilder.setContentTitle(song.getTitle())
 				.setContentText("From "+ song.getAlbum() +" by "+ song.getArtist());
 
 		setCover(song);

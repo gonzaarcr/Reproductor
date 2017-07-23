@@ -136,10 +136,10 @@ public class CollectionActivity extends AppCompatActivity
 	}
 
 	private void removePlaylist(int position) {
-		String filename = myDataset.get(position).getAlbum() + ".m3u";
+		String filename = mPlaylistDataset.get(position).getAlbum() + ".m3u";
 		mPlaylistDataset.remove(position);
 		mPlaylistAdapter.notifyDataSetChanged();
-		File file = new File(getFilesDir(), filename);
+		File file = new File(getFilesDir() + "/" + filename);
 		file.delete();
 	}
 

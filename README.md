@@ -6,9 +6,9 @@ Existen dos maneras de agregar un álbum a la lista de reproducción. Una clique
 
 Para eliminar una canción de la lista de reproducción se debe cliquear en el signo `-` al lado de la canción deseada.
 
-Una vez que se tenga la lista deseada, ésta se puede guardar. Para ésto se debe seleccionar la opción “guardar” en el menú superior y darle el nombre deseado a la lista. Para cargar una lista guardada anteriormente se debe ir a la vista de la colección musical y seleccionar la opción de “listas guardadas” en el menú superior. Allí apareceran todas las listas guardadas anteriormente, con la opción de eliminarlas si se desea.
+Una vez que se tenga la lista deseada, ésta se puede guardar. Para ésto se debe seleccionar la opción “guardar” en el menú superior y darle el nombre deseado a la lista. Para cargar una lista guardada anteriormente se debe ir a la vista de la colección musical y seleccionar la opción de “listas guardadas” en el menú superior. Allí aparecerán todas las listas guardadas anteriormente, con la opción de eliminarlas si se desea.
 
-Las letras se guardan con el en nombre “<artista> - <track>” en el almacenamiento interno de la aplicación.
+Las letras se guardan con el en nombre “\<artista\> - \<track\>” en el almacenamiento interno de la aplicación.
 
 ## Letras
 

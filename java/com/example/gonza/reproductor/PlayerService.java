@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -18,7 +17,6 @@ import android.util.Log;
 import com.example.gonza.widget.MyNotification;
 import com.example.gonza.widget.Widget;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -32,6 +30,7 @@ MediaPlayer.OnCompletionListener {
 	public static final String ACTION_PLAYPAUSE = APP_PKG + ".PlayPause";
 	public static final String ACTION_STOP = APP_PKG + ".Stop";
 	public static final String ACTION_FORDWARD = APP_PKG + ".Forward";
+	public static final String ACTION_TELL_STATE = APP_PKG + ".TellState";
 
 	private final String TAG = "PlayerService";
 
@@ -53,7 +52,12 @@ MediaPlayer.OnCompletionListener {
 				case ACTION_PLAYPAUSE: playPause(); break;
 				case ACTION_STOP: stop(); break;
 				case ACTION_FORDWARD: nextSong(); break;
+				case ACTION_TELL_STATE:
+					broadcastSongChange(playing);
+					broadcastState(currentState);
+					break;
 			}
+			Log.d(TAG, intent.getAction());
 		}
 	};
 
@@ -78,6 +82,7 @@ MediaPlayer.OnCompletionListener {
 		filter.addAction(ACTION_PLAYPAUSE);
 		filter.addAction(ACTION_STOP);
 		filter.addAction(ACTION_FORDWARD);
+		filter.addAction(ACTION_TELL_STATE);
 		registerReceiver(broadcastReceiver, filter);
 	}
 
@@ -102,7 +107,7 @@ MediaPlayer.OnCompletionListener {
 
 	@Override
 	public boolean onUnbind(Intent intent) {
-		musicPlayer.stop();
+		stop();
 		musicPlayer.release();
 		return false;
 	}
@@ -216,6 +221,10 @@ MediaPlayer.OnCompletionListener {
 		for (ServiceCallback c: callbacks) {
 			c.onStateChange(state);
 		}
+		broadcastState(state);
+	}
+
+	private void broadcastState(State state) {
 		Intent i = new Intent(this, Widget.class);
 		i.setAction("stateChange");
 		i.putExtra("state", state);
@@ -232,6 +241,10 @@ MediaPlayer.OnCompletionListener {
 			c.onSongChange(song);
 		}
 		updateNotification(song);
+		broadcastSongChange(song);
+	}
+
+	private void broadcastSongChange(Song song) {
 		if (song != null) {
 			Intent i = new Intent(this, Widget.class);
 			i.setAction("songChange");

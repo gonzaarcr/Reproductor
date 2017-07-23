@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.MergeCursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -310,17 +311,19 @@ public class PlayerActivity extends AppCompatActivity
 		} else {
 			// Crea la playlist a partir de una playlist guardada
 			String[] selectionArgs = data.getStringArrayExtra("savedPlaylist");
-			StringBuilder selection = new StringBuilder();
-			for (int i = 0; i < selectionArgs.length; i++)
-				selection.append(MediaStore.Audio.Media.DATA + "= ? OR ");
-			selection.append(MediaStore.Audio.Media.DATA + "= ?");
-			cursor = getContentResolver().query(
-					MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-					projection,
-					selection.toString(),
-					selectionArgs,
-					MediaStore.Audio.Media.TRACK
-			);
+			Cursor[] cursors = new Cursor[selectionArgs.length];
+			// Para mantener el orden, consulta uno a uno
+			// equivalente a UNION en sql
+			for (int i = 0; i < selectionArgs.length; i++) {
+				cursors[i] = getContentResolver().query(
+						MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+						projection,
+						MediaStore.Audio.Media.DATA + "= ?",
+						new String[] { selectionArgs[i] },
+						null
+				);
+			}
+			cursor = new MergeCursor(cursors);
 		}
 
 		String albumArt = data.getStringExtra("albumCover");

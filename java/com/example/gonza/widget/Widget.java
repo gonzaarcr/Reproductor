@@ -6,10 +6,7 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.util.Log;
-import android.widget.ImageButton;
 import android.widget.RemoteViews;
 
 import com.example.gonza.reproductor.PlayerService;
@@ -19,24 +16,20 @@ public class Widget extends AppWidgetProvider {
 
 	private static final String TAG = "Widget";
 
-	private ImageButton backward;
-	private ImageButton playPause;
-	private ImageButton forward;
-	private ImageButton stop;
-
 	@Override
 	public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
 		super.onUpdate(context, appWidgetManager, appWidgetIds);
 
 		final RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
-		Log.d(TAG, "onUpdate");
+		Intent iTellState = new Intent();
+		iTellState.setAction(PlayerService.ACTION_TELL_STATE);
+		context.sendBroadcast(iTellState);
 		init(context, views);
 	}
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		super.onReceive(context, intent);
-		Log.d(TAG, "onReceive");
 
 		final RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
 		String event = intent.getAction();
